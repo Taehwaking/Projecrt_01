@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Add Product</title>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <header>
+      <h1>Add Product</h1>
+    </header>
+    <nav>
+      <ul>
+        <li><a href="addProduct.html">Add Product</a></li>
+        <li><a href="dryProducts.html">Dry Products</a></li>
+        <li><a href="freshProducts.html">Fresh Products</a></li>
+        <li><a href="frozenProducts.html">Frozen Products</a></li>
+        <li><a href="#">Cart</a></li>
+      </ul>
+    </nav>
+    <main>
+      <h2>Product Information</h2>
+      <form id="productForm" onsubmit="addProduct(event)">
+        <label for="name">Product Name:</label>
+        <input type="text" id="name" required /><br />
+
+        <label for="brand">Brand:</label>
+        <input type="text" id="brand" required /><br />
+
+        <label for="expiration">Expiration Date:</label>
+        <input type="date" id="expiration" required /><br />
+
+        <label for="type">Type:</label>
+        <select id="type">
+          <option value="dry">Dry</option>
+          <option value="fresh">Fresh</option>
+          <option value="frozen">Frozen</option></select
+        ><br />
+
+        <label for="photo">Photo:</label>
+        <input type="file" id="photoInput" accept="image/*" required /><br />
+        <img
+          id="photoPreview"
+          alt="Image preview"
+          style="display: none; width: 150px; height: 150px"
+        /><br />
+
+        <label for="description">Description:</label>
+        <textarea id="description" required></textarea><br />
+
+        <button type="submit">Add Product</button>
+      </form>
+    </main>
+    <footer>
+      <p>&copy; 2024 KAICO</p>
+    </footer>
+
+    <script>
+      function addProduct(event) {
+        event.preventDefault();
+        const name = document.getElementById("name").value;
+        const brand = document.getElementById("brand").value;
+        const expiration = document.getElementById("expiration").value;
+        const type = document.getElementById("type").value;
+        const photoInput = document.getElementById("photoInput");
+        const description = document.getElementById("description").value;
+
+        const photoFile = photoInput.files[0];
+
+        // Create FormData object to send data
+        const formData = new FormData();
+        formData.append("photo", photoFile); // Append the image file
+        formData.append("name", name);
+        formData.append("brand", brand);
+        formData.append("expiration", expiration);
+        formData.append("type", type);
+        formData.append("description", description);
+
+        // Send data to the Flask server
+        fetch("http://localhost:5000/upload", {
+          method: "POST",
+          body: formData,
+        })
+          .then((response) => response.json())
+          .then((data) => {
+            if (data.imageUrl) {
+              alert(
+                "Product added successfully with image available at: " +
+                  data.imageUrl
+              );
+            } else {
+              alert("Error: " + data.error);
+            }
+          })
+          .catch((error) => {
+            console.error("Error uploading product:", error);
+            alert("Error uploading product: " + error);
+          });
+
+        // Clear the form after addition (Optional)
+        document.getElementById("productForm").reset();
+        document.getElementById("photoPreview").style.display = "none";
+      }
+      function saveDate() {
+        const dateInput = document.getElementById("dateInput").value;
+        fetch("/save_date", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ date: dateInput }),
+        })
+          .then((response) => response.json())
+          .then((data) => {
+            alert("Date saved: " + data.date_saved);
+          })
+          .catch((error) => {
+            console.error("Error:", error);
+          });
+      }
+    </script>
+  </body>
+</html>

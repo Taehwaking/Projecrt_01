@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fresh Products</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <header>
+        <h1>Fresh Products</h1>
+    </header>
+    <nav>
+        <ul>
+            <li><a href="addProduct.html">Add Product</a></li>
+            <li><a href="dryProducts.html">Dry Products</a></li>
+            <li><a href="freshProducts.html">Fresh Products</a></li>
+            <li><a href="frozenProducts.html">Frozen Products</a></li>
+            <li><a href="#">Cart</a></li>
+        </ul>
+    </nav>
+    <main>
+        <h2>Fresh Products</h2>
+        <div id="product-list"></div> <!-- Where fresh products will be displayed -->
+    </main>
+    <footer>
+        <p>&copy; 2024 KAICO</p>
+    </footer>
+
+    <script>
+        function loadFreshProducts() {
+            const products = JSON.parse(localStorage.getItem('products')) || [];
+            const productList = document.getElementById('product-list');
+            productList.innerHTML = ''; // Clear existing products
+
+            products.forEach((product, index) => {
+                if (product.type === 'fresh') {
+                    productList.appendChild(createProductElement(product, index));
+                }
+            });
+        }
+
+        function createProductElement(product, index) {
+            const productDiv = document.createElement('div');
+            productDiv.classList.add('product');
+            productDiv.innerHTML = `
+                <h3>${product.name}</h3>
+                <div>
+                    <strong>Brand:</strong> ${product.brand}<br>
+                    <strong>Expiration Date:</strong> ${product.expiration}<br>
+                </div>
+                <img src="${product.photo}" alt="${product.name}" style="width: 150px; height: 150px;">
+                <p>${product.description}</p>
+                <button onclick="deleteProduct(${index})">Delete</button>
+            `;
+            return productDiv;
+        }
+
+        function deleteProduct(index) {
+            const products = JSON.parse(localStorage.getItem('products')) || [];
+            products.splice(index, 1);
+            localStorage.setItem('products', JSON.stringify(products));
+            loadFreshProducts();
+        }
+
+        window.onload = loadFreshProducts;
+    </script>
+</body>
+</html>
